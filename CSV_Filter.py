@@ -30,11 +30,9 @@ class Filter:
             x = x & i
         return x
     
-    def run(self, Heads):
-        self.TrieOBJ.CaseSensitive = True
+    def FilterByRegEx(self, Heads):
         boolList = []
-        self.MakeTrie()
-
+        Badwords = self.MakeWordList_UsingRegex()
 
         while True:
 
@@ -42,23 +40,48 @@ class Filter:
 
                 df = self.ProducerQueue.get()
 
+                for head in Heads:
+                    boolList.append( df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) )
 
-                """
-                # for head in Heads:
-                bool_checker =  df[Heads].str.contains(Maded_Trie, regex = True, flags = re.I, na= False)
+                bool_checker = self.Return_True_False(boolList)
                 self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
-                """
-                print(type(Heads))
+
+                if self.Iteration_counter == self.MaxNumber:
+                    self.ConsumerQueue.put(None)
+                    break;
+
+                self.Iteration_counter+=1 
+                boolList.clear()
+        
+        #if you want to use fitler class again
+        self.Iteration_counter = 1
+
+    def FilterByTrie(self, Heads):
+        boolList = []
+        self.MakeTrie()
+
+        while True:
+
+            if not self.ProducerQueue.empty():
+
+                df = self.ProducerQueue.get()
+
                 for head in Heads:
                     boolList.append( df[head].apply(self.TrieOBJ.PartialSearch) )
 
                 bool_checker = self.Return_True_False(boolList)
-
 
                 self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
 
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
                     break;
+
                 self.Iteration_counter+=1 
                 boolList.clear()
+
+        #if you want to use fitler class again
+        self.Iteration_counter = 1
+
+    def run(self, Heads):
+        self.FilterByTrie(Heads)
