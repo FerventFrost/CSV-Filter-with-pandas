@@ -24,10 +24,15 @@ class Filter:
         BadWord = '|'.join(re.escape(x[0]) for x in BadCSVWords.values)
         return BadWord
 
-
+    def Return_True_False(self, BoolList):
+        x = BoolList[0]
+        for i in BoolList:
+            x = x & i
+        return x
+    
     def run(self, Heads):
         self.TrieOBJ.CaseSensitive = True
-        # bool_checker = []
+        boolList = []
         self.MakeTrie()
 
 
@@ -43,10 +48,17 @@ class Filter:
                 bool_checker =  df[Heads].str.contains(Maded_Trie, regex = True, flags = re.I, na= False)
                 self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
                 """
-                bool_checker = df[Heads].apply(self.TrieOBJ.PartialSearch)
+                print(type(Heads))
+                for head in Heads:
+                    boolList.append( df[head].apply(self.TrieOBJ.PartialSearch) )
+
+                bool_checker = self.Return_True_False(boolList)
+
+
                 self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
 
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
                     break;
                 self.Iteration_counter+=1 
+                boolList.clear()

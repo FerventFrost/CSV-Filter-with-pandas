@@ -11,4 +11,4 @@ class Producer:
     def run(self): 
         df = pd.read_csv(self.FilePath, chunksize= self.ChunkSize, nrows = self.ChunkSize * self.MaxNumber, low_memory=False, usecols=[0,2,4])
         for chunk in df:
-            self.ProducerQueue.put(chunk)
+            self.ProducerQueue.put(chunk.dropna())

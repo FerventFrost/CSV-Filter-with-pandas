@@ -31,6 +31,7 @@ class Trie(object):
             if char not in node.children:
                 self.output = False
                 return False
+                
             #if Not
             node = node.children[char]
 
@@ -51,7 +52,8 @@ class Trie(object):
                 if node == self.root:
                     continue
                 return False
-
+        
+            #if Not
             node = node.children[char]
 
         return True

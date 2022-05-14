@@ -18,7 +18,7 @@ if __name__ == "__main__":
     
     #Create Thread
     producer_thread = threading.Thread(target=CSVProducer.run())
-    Filter_thread = threading.Thread(target=CSVFilter.run("JODI"))
+    Filter_thread = threading.Thread(target=CSVFilter.run(["JODI", "SKALA"]))
     consumer_thread = threading.Thread(target=CSVConsumer.run())
 
     #Start Thread
