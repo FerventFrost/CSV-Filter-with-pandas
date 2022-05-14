@@ -8,15 +8,11 @@ class TrieNode:
 
 
 class Trie(object):
-    CaseSensitive = False
     def __init__(self):
         self.root = TrieNode("")
 
-    def insert(self, word, case_sensitive = False):
+    def insert(self, word):
         nood = self.root 
-
-        if self.CaseSensitive:
-            word = word.lower()
 
         for char in word:
             if char not in nood.children:
@@ -24,15 +20,12 @@ class Trie(object):
             nood = nood.children[char]
         nood.is_end = True     
 
-    def search(self, x, case_sensitive = False):
+    def search(self, x):
         node = self.root
 
         #if x empty
         if not len(x):
             return False
-
-        if self.CaseSensitive:
-            x = x.lower()
 
         for char in x:
             if char not in node.children:
@@ -45,15 +38,12 @@ class Trie(object):
         return True      
 
 
-    def PartialSearch(self, x, case_sensitive = False):
+    def PartialSearch(self, x):
         node = self.root
 
         #if x empty
         if not len(x):
             return False
-
-        if self.CaseSensitive:
-            x = x.lower()
 
         for char in x:
 
