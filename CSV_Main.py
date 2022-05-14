@@ -4,17 +4,19 @@ from CSV_Producer import Producer
 import queue
 import threading
 import time
+import pandas as pd
 
 if __name__ == "__main__":
-    NoRows = 3
+    TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
+    NoRows = 10
     Producer_Filter = queue.Queue()
     Filter_Counsumer = queue.Queue()
     start = time.time()
 
     #Create Objects
-    CSVProducer = Producer(Producer_Filter, ".\\2.csv", 10**4, NoRows)
-    CSVConsumer = Consumer(Filter_Counsumer)
-    CSVFilter = Filter(Producer_Filter, Filter_Counsumer, ".\\badWords.csv", NoRows)
+    CSVProducer = Producer(Producer_Filter, ".\\2.csv", 10**5, NoRows, TimeDict)
+    CSVConsumer = Consumer(Filter_Counsumer, TimeDict)
+    CSVFilter = Filter(Producer_Filter, Filter_Counsumer, ".\\badWords.csv", NoRows, TimeDict)
     
     #Create Thread
     producer_thread = threading.Thread(target=CSVProducer.run())
@@ -32,4 +34,9 @@ if __name__ == "__main__":
     consumer_thread.join()
 
     end = time.time()
-    print(f"All finshed in : {end - start}")
+
+    TimeDict["TotalTime"].append(end - start)
+    Benchmark = pd.DataFrame.from_dict(TimeDict, orient = 'index')
+    Benchmark = Benchmark.transpose()
+    Benchmark.to_csv("Benchmark.csv")
+    print(Benchmark)

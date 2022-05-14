@@ -1,4 +1,5 @@
 import re
+import time
 import pandas as pd
 from CSV_Trie import Trie
 
@@ -6,11 +7,12 @@ class Filter:
     Iteration_counter = 1
     TrieOBJ = Trie()
 
-    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, MaxNumber):
+    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, MaxNumber, TimeDict):
         self.ProducerQueue = ProducerQueue
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
         self.MaxNumber = MaxNumber
+        self.TimeDict = TimeDict
 
     def MakeTrie(self):
         
@@ -40,10 +42,16 @@ class Filter:
 
                 df = self.ProducerQueue.get()
 
+                start = time.time()
+
                 for head in Heads:
                     boolList.append( df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) )
 
                 bool_checker = self.Return_True_False(boolList)
+
+                end = time.time()
+                self.TimeDict["Filter"].append(end - start)
+                
                 self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
 
                 if self.Iteration_counter == self.MaxNumber:
@@ -66,13 +74,21 @@ class Filter:
 
                 df = self.ProducerQueue.get()
 
+                start = time.time()
+
                 for head in Heads:
                     boolList.append( df[head].apply(self.TrieOBJ.PartialSearch) )
-
                 bool_checker = self.Return_True_False(boolList)
 
-                self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
+                end = time.time()
 
+                healthy_df = df[~bool_checker]
+                bad_df = df[bool_checker]
+                self.TimeDict["Filter"].append(end - start)
+                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
+                self.TimeDict["BadRecord"].append(bad_df.shape)
+
+                self.ConsumerQueue.put( (healthy_df, bad_df) )
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
                     break;
