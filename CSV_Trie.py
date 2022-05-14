@@ -5,6 +5,8 @@ class TrieNode:
         self.children = {}
         self.is_end = False
 
+
+
 class Trie(object):
 
     def __init__(self):
@@ -16,16 +18,8 @@ class Trie(object):
             if char not in nood.children:
                 nood.children[char] = TrieNode(char)
             nood = nood.children[char]
-        nood.is_end = True
+        nood.is_end = True     
 
-    def dfs(self, node, pre):
- 
-        if node.is_end:
-            self.output.append((pre + node.char))
-         
-        for child in node.children.values():
-            self.dfs(child, pre + node.char)
-         
     def search(self, x):
         
         node = self.root
@@ -41,17 +35,17 @@ class Trie(object):
         return True      
 
 
-if __name__ == "__main__":
-    tr = Trie()
-    tr.insert("here")
-    tr.insert("hear")
-    tr.insert("he")
-    tr.insert("hello")
-    tr.insert("how ")
-    tr.insert("her")
+# if __name__ == "__main__":
+#     tr = Trie()
+#     tr.insert("here")
+#     tr.insert("hear")
+#     tr.insert("he")
+#     tr.insert("hello")
+#     tr.insert("how ")
+#     tr.insert("her")
 
-    #Search Function Returns True if the word is found in the trie
-    print(tr.search("heres"))
-    #you can also use the output variable to get the output which is True or False
-    tr.search("he")
-    print(tr.output)
+#     #Search Function Returns True if the word is found in the trie
+#     print(tr.search("heres"))
+#     #you can also use the output variable to get the output which is True or False
+#     tr.search("he")
+#     print(tr.output)
