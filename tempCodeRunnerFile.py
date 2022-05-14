@@ -1,1 +1,1 @@
-badWords
+word

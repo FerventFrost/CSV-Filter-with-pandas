@@ -8,22 +8,32 @@ class TrieNode:
 
 
 class Trie(object):
-
+    CaseSensitive = False
     def __init__(self):
         self.root = TrieNode("")
 
-    def insert(self, word):
-        nood = self.root    
+    def insert(self, word, case_sensitive = False):
+        nood = self.root 
+
+        if self.CaseSensitive:
+            word = word.lower()
+
         for char in word:
             if char not in nood.children:
                 nood.children[char] = TrieNode(char)
             nood = nood.children[char]
         nood.is_end = True     
 
-    def search(self, x):
-        
+    def search(self, x, case_sensitive = False):
         node = self.root
-         
+
+        #if x empty
+        if not len(x):
+            return False
+
+        if self.CaseSensitive:
+            x = x.lower()
+
         for char in x:
             if char not in node.children:
                 self.output = False
@@ -35,17 +45,43 @@ class Trie(object):
         return True      
 
 
-# if __name__ == "__main__":
-#     tr = Trie()
-#     tr.insert("here")
-#     tr.insert("hear")
-#     tr.insert("he")
-#     tr.insert("hello")
-#     tr.insert("how ")
-#     tr.insert("her")
+    def PartialSearch(self, x, case_sensitive = False):
+        node = self.root
 
-#     #Search Function Returns True if the word is found in the trie
-#     print(tr.search("heres"))
-#     #you can also use the output variable to get the output which is True or False
-#     tr.search("he")
-#     print(tr.output)
+        #if x empty
+        if not len(x):
+            return False
+
+        if self.CaseSensitive:
+            x = x.lower()
+
+        for char in x:
+
+            if char not in node.children:     
+                if node == self.root:
+                    continue
+                return False
+
+            node = node.children[char]
+
+        return True
+
+if __name__ == "__main__":
+    tr = Trie()
+    tr.insert("here")
+    tr.insert("hear")
+    tr.insert("he")
+    tr.insert("hello")
+    tr.insert("how ")
+    tr.insert("her")
+    # Search Function Returns True if the word is found in the trie
+    print(tr.search("heres"))
+    #you can also use the output variable to get the output which is True or False
+    tr.search("he")
+    print(tr.output)
+
+
+    #Partial Search Function
+    print(tr.PartialSearch("shge"))
+    print(tr.PartialSearch("she"))
+    print(tr.PartialSearch(""))
