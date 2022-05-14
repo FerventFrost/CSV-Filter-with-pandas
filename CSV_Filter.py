@@ -50,9 +50,14 @@ class Filter:
                 bool_checker = self.Return_True_False(boolList)
 
                 end = time.time()
+                healthy_df = df[~bool_checker]
+                bad_df = df[bool_checker]
+
                 self.TimeDict["Filter"].append(end - start)
+                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
+                self.TimeDict["BadRecord"].append(bad_df.shape)
                 
-                self.ConsumerQueue.put( (df[~bool_checker], df[bool_checker]) )
+                self.ConsumerQueue.put( (healthy_df, bad_df) )
 
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
