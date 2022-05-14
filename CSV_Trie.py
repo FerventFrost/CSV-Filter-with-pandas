@@ -50,5 +50,8 @@ if __name__ == "__main__":
     tr.insert("how ")
     tr.insert("her")
 
-    tr.search("heres")
+    #Search Function Returns True if the word is found in the trie
+    print(tr.search("heres"))
+    #you can also use the output variable to get the output which is True or False
+    tr.search("he")
     print(tr.output)
