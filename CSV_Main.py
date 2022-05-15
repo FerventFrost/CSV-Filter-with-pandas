@@ -3,11 +3,12 @@ from CSV_Consumer import Consumer
 from CSV_Producer import Producer
 import queue
 import threading
+import time
 import pandas as pd
 
 class CSVFilter:
     TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
-    
+    TotalTime = 0
     def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = []):
         self.FilePath = FilePath
         self.BadWordPath = BadWordPath
@@ -37,6 +38,8 @@ class CSVFilter:
     def run(self):
 
         if self.check_input():
+            start = time.time()
+
             #Create Queues
             Producer_Filter = queue.Queue()
             Filter_Counsumer = queue.Queue()
@@ -55,12 +58,15 @@ class CSVFilter:
             Filter_thread.start()
             consumer_thread.start()
         
-            #Wait for Threads to Finish
+            # #Wait for Threads to Finish
             producer_thread.join()
             Filter_thread.join()
             consumer_thread.join()
 
+            end = time.time()
+            self.TotalTime = end - start
             #Save Benchmark
+            self.TimeDict["TotalTime"].append(self.TotalTime)
             Benchmark = pd.DataFrame.from_dict(self.TimeDict, orient = 'index')
             Benchmark = Benchmark.transpose()
             Benchmark.to_csv("Benchmark.csv")

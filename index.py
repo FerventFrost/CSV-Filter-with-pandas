@@ -1,5 +1,4 @@
 from CSV_Main import CSVFilter
-import time
 
 
 if __name__ == "__main__":
@@ -7,11 +6,9 @@ if __name__ == "__main__":
     FilePath = ".\\2.csv"
     BadWordPath = ".\\badWords.csv"
     chunkSize = 10**4
-    FilteredBy = ["JODI", "SKALA", "PO BOX 4"]
+    FilteredBy = [0, 1, 2]
 
 
-    start = time.time()
     Main = CSVFilter(FilePath, BadWordPath, chunkSize, maxNumber, FilteredBy)
     Main.run()
-    end = time.time()
-    print(f"Total Time: {end - start}")
+    print(f"Total Time: {Main.TotalTime}")

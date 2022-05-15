@@ -24,3 +24,5 @@ class Consumer:
                 end = time.time()
                 #benchmark
                 self.TimeDict["Consumer"].append(end - start)
+
+        #Global start time - current end time

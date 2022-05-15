@@ -59,6 +59,27 @@ class Trie(object):
 
         return True
 
+    def AhoCorasick(self, x):
+        node = self.root
+        self.output = []
+
+        #if x empty
+        if not len(x):
+            return False
+
+        for char in x:
+            if char not in node.children:
+                #skip till first char in word is found in trie
+                if node == self.root:
+                    continue
+                return False
+        
+            #if Not
+            node = node.children[char]
+
+        self.output.append(node.char)
+        return True
+
 if __name__ == "__main__":
     tr = Trie()
     tr.insert("here")
@@ -76,5 +97,8 @@ if __name__ == "__main__":
 
     #Partial Search Function
     print(tr.PartialSearch("shge"))
+    print(tr.PartialSearch("shgehe"))
     print(tr.PartialSearch("she"))
     print(tr.PartialSearch(""))
+    print(tr.AhoCorasick("shgehe"))
+    #my name is mohamed
