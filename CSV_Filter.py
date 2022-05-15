@@ -45,10 +45,12 @@ class Filter:
 
                 start = time.time()
                 #Filter by multiple columns and save it in list
-                for head in Heads:
-                    #Use "~" to change True to False and False to True 
-                    #we change True to False because we want to filter bad words
-                    boolList.append( ~df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) )
+                #Use "~" to change True to False and False to True 
+                #we change True to False because we want to filter bad words
+                if type(Heads[0]) is str:
+                    boolList = [ ~df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
+                else:
+                    boolList = [ ~df.iloc[:,head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
                 bool_checker = self.Return_True_False(boolList)
 
                 end = time.time()
@@ -81,10 +83,13 @@ class Filter:
 
                 start = time.time()
                 #Filter by multiple columns and save it in list
-                for head in Heads:                    
-                    #Use "~" to change True to False and False to True 
-                    #we change True to False because we want to filter bad words
-                    boolList.append( ~df[head].apply(self.TrieOBJ.PartialSearch) )
+                #Use "~" to change True to False and False to True 
+                #we change True to False because we want to filter bad words
+                if type(Heads[0]) is str:
+                    boolList = [ ~df[head].apply(self.TrieOBJ.PartialSearch) for head in Heads ]
+                else:
+                    boolList = [ ~df.iloc[:,head].apply(self.TrieOBJ.PartialSearch) for head in Heads ]
+
                 bool_checker = self.Return_True_False(boolList)
 
                 end = time.time()
