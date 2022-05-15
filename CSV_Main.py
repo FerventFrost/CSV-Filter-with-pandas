@@ -8,13 +8,13 @@ import pandas as pd
 
 if __name__ == "__main__":
     TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
-    NoRows = 10
+    NoRows = 3
     Producer_Filter = queue.Queue()
     Filter_Counsumer = queue.Queue()
     start = time.time()
 
     #Create Objects
-    CSVProducer = Producer(Producer_Filter, ".\\2.csv", 10**5, NoRows, TimeDict)
+    CSVProducer = Producer(Producer_Filter, ".\\2.csv", 10**4, NoRows, TimeDict)
     CSVConsumer = Consumer(Filter_Counsumer, TimeDict)
     CSVFilter = Filter(Producer_Filter, Filter_Counsumer, ".\\badWords.csv", NoRows, TimeDict)
     
@@ -34,9 +34,9 @@ if __name__ == "__main__":
     consumer_thread.join()
 
     end = time.time()
+    print(f"Total Time: {end - start}")
 
     TimeDict["TotalTime"].append(end - start)
     Benchmark = pd.DataFrame.from_dict(TimeDict, orient = 'index')
     Benchmark = Benchmark.transpose()
     Benchmark.to_csv("Benchmark.csv")
-    print(Benchmark)

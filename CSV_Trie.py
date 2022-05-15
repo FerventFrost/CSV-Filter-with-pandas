@@ -31,7 +31,7 @@ class Trie(object):
             if char not in node.children:
                 self.output = False
                 return False
-                
+
             #if Not
             node = node.children[char]
 
@@ -47,8 +47,9 @@ class Trie(object):
             return False
 
         for char in x:
-
-            if char not in node.children:     
+            
+            if char not in node.children:
+                #skip till first char in word is found in trie
                 if node == self.root:
                     continue
                 return False

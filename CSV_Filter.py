@@ -12,7 +12,8 @@ class Filter:
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
         self.MaxNumber = MaxNumber
-        self.TimeDict = TimeDict
+        #benchmark
+        self.TimeDict = TimeDict    
 
     def MakeTrie(self):
         
@@ -26,6 +27,7 @@ class Filter:
         BadWord = '|'.join(re.escape(x[0]) for x in BadCSVWords.values)
         return BadWord
 
+    #Get List of Bools and return False if one of them is False
     def Return_True_False(self, BoolList):
         x = BoolList[0]
         for i in BoolList:
@@ -39,33 +41,31 @@ class Filter:
         while True:
 
             if not self.ProducerQueue.empty():
-
                 df = self.ProducerQueue.get()
 
                 start = time.time()
-
+                #Filter by multiple columns and save it in list
                 for head in Heads:
-                    boolList.append( df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) )
-
+                    #Use "~" to change True to False and False to True 
+                    #we change True to False because we want to filter bad words
+                    boolList.append( ~df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) )
                 bool_checker = self.Return_True_False(boolList)
 
                 end = time.time()
-                healthy_df = df[~bool_checker]
-                bad_df = df[bool_checker]
+                healthy_df = df[bool_checker]
+                bad_df = df[~bool_checker]
+                self.ConsumerQueue.put( (healthy_df, bad_df) )
 
+                #Benchmark
                 self.TimeDict["Filter"].append(end - start)
                 self.TimeDict["HealthyRecord"].append(healthy_df.shape)
                 self.TimeDict["BadRecord"].append(bad_df.shape)
-                
-                self.ConsumerQueue.put( (healthy_df, bad_df) )
-
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
                     break;
-
                 self.Iteration_counter+=1 
+                #clear List for next iteration
                 boolList.clear()
-        
         #if you want to use fitler class again
         self.Iteration_counter = 1
 
@@ -80,27 +80,30 @@ class Filter:
                 df = self.ProducerQueue.get()
 
                 start = time.time()
-
-                for head in Heads:
-                    boolList.append( df[head].apply(self.TrieOBJ.PartialSearch) )
+                #Filter by multiple columns and save it in list
+                for head in Heads:                    
+                    #Use "~" to change True to False and False to True 
+                    #we change True to False because we want to filter bad words
+                    boolList.append( ~df[head].apply(self.TrieOBJ.PartialSearch) )
                 bool_checker = self.Return_True_False(boolList)
 
                 end = time.time()
 
-                healthy_df = df[~bool_checker]
-                bad_df = df[bool_checker]
+                healthy_df = df[bool_checker]
+                bad_df = df[~bool_checker]
+                self.ConsumerQueue.put( (healthy_df, bad_df) )
+
+                #Benchmark
                 self.TimeDict["Filter"].append(end - start)
                 self.TimeDict["HealthyRecord"].append(healthy_df.shape)
                 self.TimeDict["BadRecord"].append(bad_df.shape)
 
-                self.ConsumerQueue.put( (healthy_df, bad_df) )
                 if self.Iteration_counter == self.MaxNumber:
                     self.ConsumerQueue.put(None)
                     break;
-
                 self.Iteration_counter+=1 
+                #clear List for next iteration
                 boolList.clear()
-
         #if you want to use fitler class again
         self.Iteration_counter = 1
 
