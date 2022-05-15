@@ -3,40 +3,64 @@ from CSV_Consumer import Consumer
 from CSV_Producer import Producer
 import queue
 import threading
-import time
 import pandas as pd
 
-if __name__ == "__main__":
+class CSVFilter:
     TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
-    NoRows = 3
-    Producer_Filter = queue.Queue()
-    Filter_Counsumer = queue.Queue()
-    start = time.time()
-
-    #Create Objects
-    CSVProducer = Producer(Producer_Filter, ".\\2.csv", 10**4, NoRows, TimeDict)
-    CSVConsumer = Consumer(Filter_Counsumer, TimeDict)
-    CSVFilter = Filter(Producer_Filter, Filter_Counsumer, ".\\badWords.csv", NoRows, TimeDict)
     
-    #Create Thread
-    producer_thread = threading.Thread(target=CSVProducer.run())
-    Filter_thread = threading.Thread(target=CSVFilter.run(["JODI", "SKALA"]))
-    consumer_thread = threading.Thread(target=CSVConsumer.run())
+    def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = []):
+        self.FilePath = FilePath
+        self.BadWordPath = BadWordPath
+        self.chunkSize = chunkSize
+        self.maxNumber = maxNumber
+        self.FilteredBy = FilteredBy
 
-    #Start Thread
-    producer_thread.start()
-    Filter_thread.start()
-    consumer_thread.start()
+    def check_input(self):
+        if self.FilePath == "":
+            print("Please input FilePath")
+            return False
+        elif self.BadWordPath == "":
+            print("Please input BadWordPath")
+            return False
+        elif self.chunkSize == 0:
+            print("Please input chunkSize")
+            return False
+        elif self.maxNumber == 0:
+            print("Please input maxNumber")
+            return False
+        elif self.FilteredBy == []:
+            print("Please input FilteredBy")
+            return False
+        else:
+            return True
 
-    #Wait for Threads to Finish
-    producer_thread.join()
-    Filter_thread.join()
-    consumer_thread.join()
+    def run(self):
 
-    end = time.time()
-    print(f"Total Time: {end - start}")
+        if self.check_input():
+            #Create Queues
+            Producer_Filter = queue.Queue()
+            Filter_Counsumer = queue.Queue()
+            #Create Objects
+            CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict)
+            CSVConsumer = Consumer(Filter_Counsumer, self.TimeDict)
+            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict)
+        
+            #Create Thread
+            producer_thread = threading.Thread(target=CSVProducer.run())
+            Filter_thread = threading.Thread(target=CSVFilter.run(self.FilteredBy))
+            consumer_thread = threading.Thread(target=CSVConsumer.run())
+        
+            #Start Thread
+            producer_thread.start()
+            Filter_thread.start()
+            consumer_thread.start()
+        
+            #Wait for Threads to Finish
+            producer_thread.join()
+            Filter_thread.join()
+            consumer_thread.join()
 
-    TimeDict["TotalTime"].append(end - start)
-    Benchmark = pd.DataFrame.from_dict(TimeDict, orient = 'index')
-    Benchmark = Benchmark.transpose()
-    Benchmark.to_csv("Benchmark.csv")
+            #Save Benchmark
+            Benchmark = pd.DataFrame.from_dict(self.TimeDict, orient = 'index')
+            Benchmark = Benchmark.transpose()
+            Benchmark.to_csv("Benchmark.csv")
