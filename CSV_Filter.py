@@ -75,7 +75,7 @@ class Filter:
     def FilterBy(self, Heads, Type):
         if Type == "regex":
             Badwords = self.MakeWordList_UsingRegex()
-        elif Type == "Aho":
+        elif Type == "aho":
             self.MakeTrie_UsingPyAcho()
             self.automaton.make_automaton()
         else:
