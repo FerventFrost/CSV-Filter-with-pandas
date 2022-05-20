@@ -19,7 +19,7 @@ class Filter:
         
         BadCSVWords = pd.read_csv(self.BadWord)
         for word in BadCSVWords.values:
-            self.TrieOBJ.insert(word[0])
+            self.TrieOBJ.insert(word[0].lower())
         return Trie
 
     def MakeWordList_UsingRegex(self):
@@ -52,7 +52,7 @@ class Filter:
                 else:
                     boolList = [ ~df.iloc[:,head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
                 bool_checker = self.Return_True_False(boolList)
-
+               
                 end = time.time()
                 healthy_df = df[bool_checker]
                 bad_df = df[~bool_checker]
@@ -86,12 +86,11 @@ class Filter:
                 #Use "~" to change True to False and False to True 
                 #we change True to False because we want to filter bad words
                 if type(Heads[0]) is str:
-                    boolList = [ ~df[head].apply(self.TrieOBJ.PartialSearch) for head in Heads ]
+                    boolList = [ ~df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
                 else:
-                    boolList = [ ~df.iloc[:,head].apply(self.TrieOBJ.PartialSearch) for head in Heads ]
+                    boolList = [ ~df.iloc[:,head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
 
                 bool_checker = self.Return_True_False(boolList)
-
                 end = time.time()
 
                 healthy_df = df[bool_checker]
@@ -112,5 +111,9 @@ class Filter:
         #if you want to use fitler class again
         self.Iteration_counter = 1
 
+    def FilterByAho(self, Heads):
+        pass
+    
     def run(self, Heads):
-        self.FilterByTrie(Heads)
+        self.FilterByRegEx(Heads)
+        # self.FilterByTrie(Heads)

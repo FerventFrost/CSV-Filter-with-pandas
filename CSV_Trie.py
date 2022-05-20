@@ -11,7 +11,6 @@ class Trie(object):
     def __init__(self):
         self.root = TrieNode("")
         self.Q = queue.Queue()
-        self.Q.put(None)
         self.Bad_is_found = False
 
     def insert(self, word):
@@ -63,7 +62,11 @@ class Trie(object):
         return True
     
     def Custom_AhoCorasick(self, x):
+        self.Bad_is_found = False
+        self.Q.queue.clear()
+        self.Q.put(None)
         node = self.root
+        x = x.lower()
         #if x empty
         if not len(x):
             return False
@@ -71,6 +74,7 @@ class Trie(object):
         for char in x:
             if char in node.children:
                 self.Q.put(node.children[char])
+
             while True:
                 temp = self.Q.get()
                 if temp is None:
@@ -100,22 +104,23 @@ if __name__ == "__main__":
     tr.insert("hear")
     tr.insert("he")
     tr.insert("hello")
-    tr.insert("how ")
+    tr.insert("how")
     tr.insert("her")
 
     #Implement my Aho Algo
-    print(tr.AhoCorasick("shghe"))
-    # Search Function Returns True if the word is found in the trie
-    print(tr.search("heres"))
-    # #you can also use the output variable to get the output which is True or False
-    tr.search("he")
-    print(tr.output)
+    print(tr.Custom_AhoCorasick("shgh"))
+    print(tr.Custom_AhoCorasick("shetw"))
+    # # Search Function Returns True if the word is found in the trie
+    # print(tr.search("heres"))
+    # # #you can also use the output variable to get the output which is True or False
+    # tr.search("he")
+    # print(tr.output)
 
 
-    # #Partial Search Function
-    print(tr.PartialSearch("shge"))
-    print(tr.PartialSearch("shgehe"))
+    # # #Partial Search Function
     print(tr.PartialSearch("she"))
-    print(tr.PartialSearch(""))
-    print(tr.AhoCorasick("shgehe"))
+    # print(tr.PartialSearch("shgehe"))
+    # print(tr.PartialSearch("she"))
+    # print(tr.PartialSearch(""))
+    # print(tr.AhoCorasick("shgehe"))
     # #my name is mohamed
