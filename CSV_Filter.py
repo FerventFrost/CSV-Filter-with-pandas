@@ -14,6 +14,8 @@ class Filter:
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
         self.MaxNumber = MaxNumber
+        self.df = 0
+        self.boolList = []
         #benchmark
         self.TimeDict = TimeDict    
 
@@ -41,130 +43,49 @@ class Filter:
             x = x & i
         return x
     
-    def FilterByRegEx(self, Heads):
-        boolList = []
-        Badwords = self.MakeWordList_UsingRegex()
-
-        while True:
-
-            if not self.ProducerQueue.empty():
-                df = self.ProducerQueue.get()
-
-                if df is None:
-                    self.ConsumerQueue.put(None)
-                    break
-
-                start = time.time()
-                #Filter by multiple columns and save it in list
-                #Use "~" to change True to False and False to True 
-                #we change True to False because we want to filter bad words
-                if type(Heads[0]) is str:
-                    boolList = [ ~df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
-                else:
-                    boolList = [ ~df.iloc[:,head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
-                bool_checker = self.Return_True_False(boolList)
-               
-                end = time.time()
-                healthy_df = df[bool_checker]
-                bad_df = df[~bool_checker]
-                self.ConsumerQueue.put( (healthy_df, bad_df) )
-
-                #Benchmark
-                self.TimeDict["Filter"].append(end - start)
-                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
-                self.TimeDict["BadRecord"].append(bad_df.shape)
-                #clear List for next iteration
-                boolList.clear()
-        #if you want to use fitler class again
+    #Filter by multiple columns and save it in list
+    #Use "~" to change True to False and False to True 
+    #we change True to False because we want to filter bad words
+    def FilterByRegEx(self, Heads, Badwords):
+        if type(Heads[0]) is str:
+            self.boolList = [ ~self.df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
+        else:
+            self.boolList = [ ~self.df.iloc[:,head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
+        bool_checker = self.Return_True_False(self.boolList)
+        return bool_checker
 
     def FilterByTrie(self, Heads):
-        boolList = []
-        self.MakeTrie()
+        if type(Heads[0]) is str:
+            self.boolList = [ ~self.df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
+        else:
+            self.boolList = [ ~self.df.iloc[:,head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
 
-        while True:
-
-            if not self.ProducerQueue.empty():
-
-                df = self.ProducerQueue.get()
-
-                start = time.time()
-                #Filter by multiple columns and save it in list
-                #Use "~" to change True to False and False to True 
-                #we change True to False because we want to filter bad words
-                if type(Heads[0]) is str:
-                    boolList = [ ~df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
-                else:
-                    boolList = [ ~df.iloc[:,head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
-
-                bool_checker = self.Return_True_False(boolList)
-                end = time.time()
-
-                healthy_df = df[bool_checker]
-                bad_df = df[~bool_checker]
-                self.ConsumerQueue.put( (healthy_df, bad_df) )
-
-                #Benchmark
-                self.TimeDict["Filter"].append(end - start)
-                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
-                self.TimeDict["BadRecord"].append(bad_df.shape)
-
-                if self.Iteration_counter == self.MaxNumber:
-                    self.ConsumerQueue.put(None)
-                    break;
-                self.Iteration_counter+=1 
-                #clear List for next iteration
-                boolList.clear()
-        #if you want to use fitler class again
-        self.Iteration_counter = 1
+        bool_checker = self.Return_True_False(self.boolList)
+        return bool_checker
 
     def FilterByAho(self, Heads):
-        boolList = []
-        self.MakeTrie_UsingPyAcho()
-        self.automaton.make_automaton()
-        while True:
+        if type(Heads[0]) is str:
+            self.boolList = [ ~self.df[head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
+        else:
+            self.boolList = [ ~self.df.iloc[:,head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
 
-            if not self.ProducerQueue.empty():
-
-                df = self.ProducerQueue.get()
-
-                start = time.time()
-                #Filter by multiple columns and save it in list
-                #Use "~" to change True to False and False to True 
-                #we change True to False because we want to filter bad words
-                if type(Heads[0]) is str:
-                    boolList = [ ~df[head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
-                else:
-                    boolList = [ ~df.iloc[:,head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
-
-                bool_checker = self.Return_True_False(boolList)
-                end = time.time()
-
-                healthy_df = df[bool_checker]
-                bad_df = df[~bool_checker]
-                self.ConsumerQueue.put( (healthy_df, bad_df) )
-
-                #Benchmark
-                self.TimeDict["Filter"].append(end - start)
-                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
-                self.TimeDict["BadRecord"].append(bad_df.shape)
-
-                if self.Iteration_counter == self.MaxNumber:
-                    self.ConsumerQueue.put(None)
-                    break;
-                self.Iteration_counter+=1 
-                #clear List for next iteration
-                boolList.clear()
-        #if you want to use fitler class again
-        self.Iteration_counter = 1
-        pass
+        bool_checker = self.Return_True_False(self.boolList)
+        return bool_checker
     
     def FilterBy(self, Heads, Type):
-        boolList = []
+        if Type == "regex":
+            Badwords = self.MakeWordList_UsingRegex()
+        elif Type == "Aho":
+            self.MakeTrie_UsingPyAcho()
+            self.automaton.make_automaton()
+        else:
+            self.MakeTrie()
+
         while True:
             if not self.ProducerQueue.empty():
-                df = self.ProducerQueue.get()
+                self.df = self.ProducerQueue.get()
 
-                if df is None:
+                if self.df is None:
                     self.ConsumerQueue.put(None)
                     break
 
@@ -173,15 +94,17 @@ class Filter:
                 #Use "~" to change True to False and False to True 
                 #we change True to False because we want to filter bad words
 
-                if Type is "regex":
-                    bool_checker = self.FilterByRegEx(Heads)
-                elif Type is "Aho":
+                if Type == "regex":
+                    bool_checker = self.FilterByRegEx(Heads, Badwords)
+                elif Type == "Aho":
                     bool_checker = self.FilterByAho(Heads)
                 else:
                     bool_checker = self.FilterByTrie(Heads)
+
                 end = time.time()
-                healthy_df = df[bool_checker]
-                bad_df = df[~bool_checker]
+
+                healthy_df = self.df[bool_checker]
+                bad_df = self.df[~bool_checker]
                 self.ConsumerQueue.put( (healthy_df, bad_df) )
 
                 #Benchmark
@@ -189,9 +112,7 @@ class Filter:
                 self.TimeDict["HealthyRecord"].append(healthy_df.shape)
                 self.TimeDict["BadRecord"].append(bad_df.shape)
                 #clear List for next iteration
-                boolList.clear()
+                self.boolList.clear()
 
-    def run(self, Heads):
-        # self.FilterByRegEx(Heads)
-        self.FilterByTrie(Heads)
-        # self.FilterByAho(Heads)
+    def run(self, Heads, Type):
+        self.FilterBy(Heads, Type)

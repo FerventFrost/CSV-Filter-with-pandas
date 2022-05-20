@@ -9,12 +9,13 @@ import pandas as pd
 class CSVFilter:
     TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
     TotalTime = 0
-    def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = []):
+    def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = [], Type = ""):
         self.FilePath = FilePath
         self.BadWordPath = BadWordPath
         self.chunkSize = chunkSize
         self.maxNumber = maxNumber
         self.FilteredBy = FilteredBy
+        self.Type = Type
 
     def check_input(self):
         if self.FilePath == "":
@@ -51,7 +52,7 @@ class CSVFilter:
             self.TimeDict["TotalTime"].append(time.time())
             #Create Thread
             producer_thread = threading.Thread(target=CSVProducer.run())
-            Filter_thread = threading.Thread(target=CSVFilter.run(self.FilteredBy))
+            Filter_thread = threading.Thread(target=CSVFilter.run(self.FilteredBy, self.Type))
             consumer_thread = threading.Thread(target=CSVConsumer.run())
         
             #Start Thread
