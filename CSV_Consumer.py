@@ -24,5 +24,5 @@ class Consumer:
                 end = time.time()
                 #benchmark
                 self.TimeDict["Consumer"].append(end - start)
-
         #Global start time - current end time
+        self.TimeDict["TotalTime"][0] = time.time() - self.TimeDict["TotalTime"][0]
