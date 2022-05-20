@@ -24,3 +24,5 @@ class Producer:
             self.TimeDict["TotalRecord"].append(newChunck.shape)
             
             start = time.time()
+            
+        self.ProducerQueue.put(None)
