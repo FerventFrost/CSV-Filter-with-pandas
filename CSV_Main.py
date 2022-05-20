@@ -38,7 +38,6 @@ class CSVFilter:
     def run(self):
 
         if self.check_input():
-            start = time.time()
 
             #Create Queues
             Producer_Filter = queue.Queue()
@@ -48,6 +47,8 @@ class CSVFilter:
             CSVConsumer = Consumer(Filter_Counsumer, self.TimeDict)
             CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict)
         
+            start = time.time()
+            self.TimeDict["TotalTime"].append(time.time())
             #Create Thread
             producer_thread = threading.Thread(target=CSVProducer.run())
             Filter_thread = threading.Thread(target=CSVFilter.run(self.FilteredBy))
@@ -59,14 +60,11 @@ class CSVFilter:
             consumer_thread.start()
         
             # #Wait for Threads to Finish
-            producer_thread.join()
-            Filter_thread.join()
             consumer_thread.join()
 
             end = time.time()
-            self.TotalTime = end - start
+            self.TotalTime = self.TimeDict["TotalTime"][0]
             #Save Benchmark
-            self.TimeDict["TotalTime"].append(self.TotalTime)
             Benchmark = pd.DataFrame.from_dict(self.TimeDict, orient = 'index')
             Benchmark = Benchmark.transpose()
             Benchmark.to_csv("Benchmark.csv")
