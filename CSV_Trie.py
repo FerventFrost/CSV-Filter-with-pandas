@@ -40,7 +40,7 @@ class Trie(object):
         self.output = True
         return True      
 
-
+    #Search for the First word only if the word is not the same break and exit
     def PartialSearch(self, x):
         node = self.root
 
@@ -61,6 +61,7 @@ class Trie(object):
 
         return True
     
+    #My Custom AhoCorasick
     def Custom_AhoCorasick(self, x):
         self.Bad_is_found = False
         self.Q.queue.clear()
@@ -93,6 +94,7 @@ class Trie(object):
 
         return False
     
+    #doesn't have any use
     def AhoCorasick(self, x, Custom = False):
         if Custom:
             pass

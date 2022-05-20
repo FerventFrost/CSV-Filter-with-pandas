@@ -47,7 +47,7 @@ class CSVFilter:
             CSVConsumer = Consumer(Filter_Counsumer, self.TimeDict)
             CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict)
         
-            start = time.time()
+            #start program time
             self.TimeDict["TotalTime"].append(time.time())
             #Create Thread
             producer_thread = threading.Thread(target=CSVProducer.run())
@@ -62,7 +62,7 @@ class CSVFilter:
             # #Wait for Threads to Finish
             consumer_thread.join()
 
-            end = time.time()
+            #save total time in the var.
             self.TotalTime = self.TimeDict["TotalTime"][0]
             #Save Benchmark
             Benchmark = pd.DataFrame.from_dict(self.TimeDict, orient = 'index')

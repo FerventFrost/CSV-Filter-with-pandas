@@ -158,7 +158,40 @@ class Filter:
         self.Iteration_counter = 1
         pass
     
+    def FilterBy(self, Heads, Type):
+        boolList = []
+        while True:
+            if not self.ProducerQueue.empty():
+                df = self.ProducerQueue.get()
+
+                if df is None:
+                    self.ConsumerQueue.put(None)
+                    break
+
+                start = time.time()
+                #Filter by multiple columns and save it in list
+                #Use "~" to change True to False and False to True 
+                #we change True to False because we want to filter bad words
+
+                if Type is "regex":
+                    bool_checker = self.FilterByRegEx(Heads)
+                elif Type is "Aho":
+                    bool_checker = self.FilterByAho(Heads)
+                else:
+                    bool_checker = self.FilterByTrie(Heads)
+                end = time.time()
+                healthy_df = df[bool_checker]
+                bad_df = df[~bool_checker]
+                self.ConsumerQueue.put( (healthy_df, bad_df) )
+
+                #Benchmark
+                self.TimeDict["Filter"].append(end - start)
+                self.TimeDict["HealthyRecord"].append(healthy_df.shape)
+                self.TimeDict["BadRecord"].append(bad_df.shape)
+                #clear List for next iteration
+                boolList.clear()
+
     def run(self, Heads):
-        self.FilterByRegEx(Heads)
-        # self.FilterByTrie(Heads)
+        # self.FilterByRegEx(Heads)
+        self.FilterByTrie(Heads)
         # self.FilterByAho(Heads)
