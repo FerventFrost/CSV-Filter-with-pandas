@@ -9,11 +9,10 @@ class Filter:
     TrieOBJ = Trie()
     automaton = ahocorasick.Automaton()
 
-    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, MaxNumber, TimeDict, Heads, Type):
+    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, TimeDict, Heads, Type):
         self.ProducerQueue = ProducerQueue
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
-        self.MaxNumber = MaxNumber
         self.Heads = Heads
         self.Type = Type
         self.df = 0

@@ -12,6 +12,7 @@ if __name__ == "__main__":
     BenchMark_FileName = "Benchmark"
     Healthy_FileName = "Healthy"
     Bad_FileName = "Unhealthy"
+    
     Main = CSVFilter(FilePath, BadWordPath, chunkSize, maxNumber, FilteredBy, Type, QueueMaxSize, BenchMark_FileName, Healthy_FileName, Bad_FileName)
     Main.run()
     print(f"Total Time: {Main.TotalTime}")

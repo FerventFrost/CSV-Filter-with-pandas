@@ -60,7 +60,7 @@ class CSVFilter:
             #Create Objects
             CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict, self.FileHeads)
             CSVConsumer = Consumer(Filter_Counsumer, [self.Healthy, self.Unheathly], self.TimeDict)
-            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict, self.FileHeads, self.Type)
+            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.TimeDict, self.FileHeads, self.Type)
         
             #start program time
             self.TimeDict["TotalTime"].append(time.time())
