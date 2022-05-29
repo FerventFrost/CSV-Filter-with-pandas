@@ -39,6 +39,7 @@ class Filter(threading.Thread):
         for word in BadCSVWords:
             self.automaton.add_word(word[0].lower(), word[0].lower())
         return self.automaton
+   
     #Get List of Bools and return False if one of them is False
     def Return_True_False(self, BoolList):
         x = BoolList[0]
@@ -52,16 +53,22 @@ class Filter(threading.Thread):
     def FilterByRegEx(self, Heads, Badwords):
         self.boolList = [ ~self.df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
+        #clear List for next iteration
+        self.boolList.clear()
         return bool_checker
 
     def FilterByTrie(self, Heads):
         self.boolList = [ ~self.df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
+        #clear List for next iteration
+        self.boolList.clear()
         return bool_checker
 
     def FilterByAho(self, Heads):
         self.boolList = [ ~self.df[head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
+        #clear List for next iteration
+        self.boolList.clear()
         return bool_checker
     
     def FilterBy(self):
@@ -87,10 +94,13 @@ class Filter(threading.Thread):
                 #we change True to False because we want to filter bad words
 
                 if self.Type == "regex":
+                    print("regex")
                     bool_checker = self.FilterByRegEx(self.Heads, Badwords)
                 elif self.Type == "aho":
+                    print("aho")
                     bool_checker = self.FilterByAho(self.Heads)
                 else:
+                    print("custom")
                     bool_checker = self.FilterByTrie(self.Heads)
 
                 end = time.time()
@@ -103,8 +113,6 @@ class Filter(threading.Thread):
                 self.TimeDict["Filter"].append(end - start)
                 self.TimeDict["HealthyRecord"].append(healthy_df.shape)
                 self.TimeDict["BadRecord"].append(bad_df.shape)
-                #clear List for next iteration
-                self.boolList.clear()
 
     def run(self):
         self.FilterBy()
