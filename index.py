@@ -1,4 +1,4 @@
-from CSV_Main import CSVFilter
+from Filter_CSV.CSV_Main import CSVFilter
 
 
 if __name__ == "__main__":

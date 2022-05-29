@@ -1,7 +1,7 @@
 from re import I
-from CSV_Filter import Filter
-from CSV_Consumer import Consumer
-from CSV_Producer import Producer
+from .CSV_Filter import Filter  #dot (.) to access file in the current directory
+from .CSV_Consumer import Consumer
+from .CSV_Producer import Producer
 import queue
 import threading
 import time

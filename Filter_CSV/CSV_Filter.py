@@ -1,7 +1,7 @@
 import re
 import time
 import pandas as pd
-from CSV_Trie import Trie
+from .CSV_Trie import Trie      #dot (.) to access file in the current directory
 import ahocorasick
 
 class Filter:

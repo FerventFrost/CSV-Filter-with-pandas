@@ -1,5 +1,5 @@
-from msilib.schema import File
 import time
+
 class Consumer:
 
     def __init__(self, ConsumerQueue, FileNames, TimeDict):
