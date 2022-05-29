@@ -1,4 +1,4 @@
-## Queue maxsize doesn't work
+# Queue maxsize doesn't work
 code runs fine till the queue is full, Queue(maxsize = 3)
 
 ![image](https://user-images.githubusercontent.com/90336445/170888238-865b1654-befc-46fb-9664-500bc85dbc35.png)
