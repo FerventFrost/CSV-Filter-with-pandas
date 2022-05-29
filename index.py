@@ -2,12 +2,12 @@ from CSV_Main import CSVFilter
 
 
 if __name__ == "__main__":
-    maxNumber = 3
+    maxNumber = 6
     FilePath = ".\\2.csv"
     BadWordPath = ".\\badWords.csv"
-    chunkSize = 100
+    chunkSize = 10000
     FilteredBy = [0, 1, 2]
-    Type = "custom"
+    Type = "aho"
 
     Main = CSVFilter(FilePath, BadWordPath, chunkSize, maxNumber, FilteredBy, Type)
     Main.run()

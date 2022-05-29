@@ -9,11 +9,13 @@ class Filter:
     TrieOBJ = Trie()
     automaton = ahocorasick.Automaton()
 
-    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, MaxNumber, TimeDict):
+    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, MaxNumber, TimeDict, Heads, Type):
         self.ProducerQueue = ProducerQueue
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
         self.MaxNumber = MaxNumber
+        self.Heads = Heads
+        self.Type = Type
         self.df = 0
         self.boolList = []
         #benchmark
@@ -32,7 +34,7 @@ class Filter:
         return BadWord
 
     def MakeTrie_UsingPyAcho(self):
-        BadCSVWords = pd.read_csv(self.BadWord).values.tolist()
+        BadCSVWords = pd.read_csv(self.BadWord).values
         for word in BadCSVWords:
             self.automaton.add_word(word[0].lower(), word[0].lower())
         return self.automaton
@@ -72,10 +74,10 @@ class Filter:
         bool_checker = self.Return_True_False(self.boolList)
         return bool_checker
     
-    def FilterBy(self, Heads, Type):
-        if Type == "regex":
+    def FilterBy(self):
+        if self.Type == "regex":
             Badwords = self.MakeWordList_UsingRegex()
-        elif Type == "aho":
+        elif self.Type == "aho":
             self.MakeTrie_UsingPyAcho()
             self.automaton.make_automaton()
         else:
@@ -94,17 +96,18 @@ class Filter:
                 #Use "~" to change True to False and False to True 
                 #we change True to False because we want to filter bad words
 
-                if Type == "regex":
-                    bool_checker = self.FilterByRegEx(Heads, Badwords)
-                elif Type == "Aho":
-                    bool_checker = self.FilterByAho(Heads)
+                if self.Type == "regex":
+                    bool_checker = self.FilterByRegEx(self.Heads, Badwords)
+                elif self.Type == "aho":
+                    bool_checker = self.FilterByAho(self.Heads)
                 else:
-                    bool_checker = self.FilterByTrie(Heads)
+                    bool_checker = self.FilterByTrie(self.Heads)
 
                 end = time.time()
 
                 healthy_df = self.df[bool_checker]
                 bad_df = self.df[~bool_checker]
+                print(f"ConsumerQueue: {self.ConsumerQueue.qsize()}")
                 self.ConsumerQueue.put( (healthy_df, bad_df) )
 
                 #Benchmark
@@ -114,5 +117,5 @@ class Filter:
                 #clear List for next iteration
                 self.boolList.clear()
 
-    def run(self, Heads, Type):
-        self.FilterBy(Heads, Type)
+    def run(self):
+        self.FilterBy()

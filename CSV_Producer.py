@@ -16,13 +16,12 @@ class Producer:
         start = time.time()
         for chunk in df:
             end = time.time()
-
+            print(f"Prodcure: {self.ProducerQueue.qsize()}")
             newChunck = chunk.dropna()
             self.ProducerQueue.put(newChunck)
             #benchmark
             self.TimeDict["Producer"].append(end - start)
             self.TimeDict["TotalRecord"].append(newChunck.shape)
-            
             start = time.time()
             
         self.ProducerQueue.put(None)

@@ -1,3 +1,4 @@
+from re import I
 from CSV_Filter import Filter
 from CSV_Consumer import Consumer
 from CSV_Producer import Producer
@@ -41,19 +42,19 @@ class CSVFilter:
         if self.check_input():
 
             #Create Queues
-            Producer_Filter = queue.Queue()
-            Filter_Counsumer = queue.Queue()
+            Producer_Filter = queue.Queue(maxsize=3)
+            Filter_Counsumer = queue.Queue(maxsize=3)
             #Create Objects
             CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict)
             CSVConsumer = Consumer(Filter_Counsumer, self.TimeDict)
-            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict)
+            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict, self.FilteredBy, self.Type)
         
             #start program time
             self.TimeDict["TotalTime"].append(time.time())
             #Create Thread
-            producer_thread = threading.Thread(target=CSVProducer.run())
-            Filter_thread = threading.Thread(target=CSVFilter.run(self.FilteredBy, self.Type))
-            consumer_thread = threading.Thread(target=CSVConsumer.run())
+            producer_thread = threading.Thread(target=CSVProducer.run)
+            Filter_thread = threading.Thread(target=CSVFilter.run)
+            consumer_thread = threading.Thread(target=CSVConsumer.run)
         
             #Start Thread
             producer_thread.start()
