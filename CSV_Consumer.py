@@ -1,8 +1,10 @@
+from msilib.schema import File
 import time
 class Consumer:
 
-    def __init__(self, ConsumerQueue, TimeDict):
+    def __init__(self, ConsumerQueue, FileNames, TimeDict):
         self.ConsumerQueue = ConsumerQueue
+        self.FileNames = FileNames
         #benchmark
         self.TimeDict = TimeDict
 
@@ -18,8 +20,8 @@ class Consumer:
 
                 start = time.time()  
                 #save to file  
-                message[0].to_csv("Healthy_filtered_words.csv", mode = 'a', index = False)
-                message[1].to_csv("Bad_filtered_words.csv", mode = 'a', index = False)
+                message[0].to_csv(f"{self.FileNames[0]}.csv", mode = 'a', index = False)
+                message[1].to_csv(f"{self.FileNames[1]}.csv", mode = 'a', index = False)
 
                 end = time.time()
                 #benchmark

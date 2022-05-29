@@ -49,28 +49,17 @@ class Filter:
     #Use "~" to change True to False and False to True 
     #we change True to False because we want to filter bad words
     def FilterByRegEx(self, Heads, Badwords):
-        if type(Heads[0]) is str:
-            self.boolList = [ ~self.df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
-        else:
-            self.boolList = [ ~self.df.iloc[:,head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
+        self.boolList = [ ~self.df[head].str.contains(Badwords, regex = True, flags = re.I, na= False) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
         return bool_checker
 
     def FilterByTrie(self, Heads):
-        if type(Heads[0]) is str:
-            self.boolList = [ ~self.df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
-        else:
-            self.boolList = [ ~self.df.iloc[:,head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
-
+        self.boolList = [ ~self.df[head].apply(self.TrieOBJ.Custom_AhoCorasick) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
         return bool_checker
 
     def FilterByAho(self, Heads):
-        if type(Heads[0]) is str:
-            self.boolList = [ ~self.df[head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
-        else:
-            self.boolList = [ ~self.df.iloc[:,head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
-
+        self.boolList = [ ~self.df[head].apply(lambda x : len(list(self.automaton.iter(x.lower()))) != 0) for head in Heads ]
         bool_checker = self.Return_True_False(self.boolList)
         return bool_checker
     
@@ -107,7 +96,6 @@ class Filter:
 
                 healthy_df = self.df[bool_checker]
                 bad_df = self.df[~bool_checker]
-                print(f"ConsumerQueue: {self.ConsumerQueue.qsize()}")
                 self.ConsumerQueue.put( (healthy_df, bad_df) )
 
                 #Benchmark

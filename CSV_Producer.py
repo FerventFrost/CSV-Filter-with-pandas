@@ -3,12 +3,12 @@ import pandas as pd
 import time
 
 class Producer:
-    def __init__(self, ProducerQueue, FilePath, ChunkSize, MaxNumber, TimeDict,Filteredby):
+    def __init__(self, ProducerQueue, FilePath, ChunkSize, MaxNumber, TimeDict,FileHeads):
         self.ProducerQueue = ProducerQueue
         self.FilePath = FilePath
         self.ChunkSize = ChunkSize
         self.MaxNumber = MaxNumber
-        self.Filter = Filteredby
+        self.FileHeads = FileHeads
         #benchmark
         self.TimeDict = TimeDict    
 
@@ -16,17 +16,10 @@ class Producer:
         df = pd.read_csv(self.FilePath, chunksize= self.ChunkSize, nrows = self.ChunkSize * self.MaxNumber, low_memory=False)
         #first chunk
         start = time.time()
-        # extract head names to use then in filter
-        Columns = pd.read_csv(self.FilePath, nrows= 5).columns
-
-        if type(self.Filter[0]) is int:
-            FileHeads = [Columns[i] for i in self.Filter]   #if Filter uses index then get names
-        else:
-            FileHeads = self.Filter                         #else use as it is
-
+        
         for chunk in df:
             end = time.time()
-            newChunck = chunk.dropna(subset= FileHeads)
+            newChunck = chunk.dropna(subset= self.FileHeads)
             self.ProducerQueue.put(newChunck)
             #benchmark
             self.TimeDict["Producer"].append(end - start)
