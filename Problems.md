@@ -15,6 +15,9 @@ i accidentally add parentheses in thread initialization.
 
 After removing it, it should work.
 
+![image](https://user-images.githubusercontent.com/90336445/170889021-5fbc90df-9a81-405c-bfb0-4d42baef4e90.png)
+
+
 ![image](https://user-images.githubusercontent.com/90336445/170888818-247e2488-5647-479c-bca8-d0bea4bffa94.png)
 
 Finally, so please keep an eye on these silly typos.
