@@ -94,13 +94,10 @@ class Filter(threading.Thread):
                 #we change True to False because we want to filter bad words
 
                 if self.Type == "regex":
-                    print("regex")
                     bool_checker = self.FilterByRegEx(self.Heads, Badwords)
                 elif self.Type == "aho":
-                    print("aho")
                     bool_checker = self.FilterByAho(self.Heads)
                 else:
-                    print("custom")
                     bool_checker = self.FilterByTrie(self.Heads)
 
                 end = time.time()
