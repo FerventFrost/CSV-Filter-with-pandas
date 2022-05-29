@@ -6,9 +6,10 @@ if __name__ == "__main__":
     FilePath = ".\\2.csv"
     BadWordPath = ".\\badWords.csv"
     chunkSize = 10000
-    FilteredBy = [0, 1, 2]
+    FilteredBy = ["JODI", "SKALA", "PO BOX 4"]
     Type = "aho"
+    QueueMaxSize = 3
 
-    Main = CSVFilter(FilePath, BadWordPath, chunkSize, maxNumber, FilteredBy, Type)
+    Main = CSVFilter(FilePath, BadWordPath, chunkSize, maxNumber, FilteredBy, Type, QueueMaxSize)
     Main.run()
     print(f"Total Time: {Main.TotalTime}")

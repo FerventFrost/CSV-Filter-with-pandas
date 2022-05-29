@@ -10,13 +10,14 @@ import pandas as pd
 class CSVFilter:
     TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
     TotalTime = 0
-    def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = [], Type = ""):
+    def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = [], Type = "", QueueMaxSize = 0):
         self.FilePath = FilePath
         self.BadWordPath = BadWordPath
         self.chunkSize = chunkSize
         self.maxNumber = maxNumber
         self.FilteredBy = FilteredBy
         self.Type = Type
+        self.QMaxSize = QueueMaxSize
 
     def check_input(self):
         if self.FilePath == "":
@@ -42,10 +43,10 @@ class CSVFilter:
         if self.check_input():
 
             #Create Queues
-            Producer_Filter = queue.Queue(maxsize=3)
-            Filter_Counsumer = queue.Queue(maxsize=3)
+            Producer_Filter = queue.Queue(maxsize=self.QMaxSize)
+            Filter_Counsumer = queue.Queue(maxsize=self.QMaxSize)
             #Create Objects
-            CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict)
+            CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict, self.FilteredBy)
             CSVConsumer = Consumer(Filter_Counsumer, self.TimeDict)
             CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.maxNumber, self.TimeDict, self.FilteredBy, self.Type)
         
