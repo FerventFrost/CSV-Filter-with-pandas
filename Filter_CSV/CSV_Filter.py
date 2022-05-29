@@ -1,15 +1,17 @@
 import re
 import time
+import threading
 import pandas as pd
 from .CSV_Trie import Trie      #dot (.) to access file in the current directory
 import ahocorasick
 
-class Filter:
+class Filter(threading.Thread):
     Iteration_counter = 1
     TrieOBJ = Trie()
     automaton = ahocorasick.Automaton()
 
     def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, TimeDict, Heads, Type):
+        threading.Thread.__init__(self)
         self.ProducerQueue = ProducerQueue
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath

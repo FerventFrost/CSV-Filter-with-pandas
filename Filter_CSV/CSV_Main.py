@@ -64,18 +64,14 @@ class CSVFilter:
         
             #start program time
             self.TimeDict["TotalTime"].append(time.time())
-            #Create Thread
-            producer_thread = threading.Thread(target=CSVProducer.run)
-            Filter_thread = threading.Thread(target=CSVFilter.run)
-            consumer_thread = threading.Thread(target=CSVConsumer.run)
         
             #Start Thread
-            producer_thread.start()
-            Filter_thread.start()
-            consumer_thread.start()
+            CSVProducer.start()
+            CSVFilter.start()
+            CSVConsumer.start()
         
             # #Wait for Threads to Finish
-            consumer_thread.join()
+            CSVConsumer.join()
 
             #save total time in the var.
             self.TotalTime = self.TimeDict["TotalTime"][0]

@@ -1,8 +1,11 @@
+import imp
 import pandas as pd
 import time
+import threading
 
-class Producer:
+class Producer(threading.Thread):
     def __init__(self, ProducerQueue, FilePath, ChunkSize, MaxNumber, TimeDict,FileHeads):
+        threading.Thread.__init__(self)
         self.ProducerQueue = ProducerQueue
         self.FilePath = FilePath
         self.ChunkSize = ChunkSize

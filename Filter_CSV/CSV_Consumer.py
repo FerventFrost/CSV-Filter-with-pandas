@@ -1,8 +1,10 @@
 import time
+import threading
 
-class Consumer:
+class Consumer(threading.Thread):
 
     def __init__(self, ConsumerQueue, FileNames, TimeDict):
+        threading.Thread.__init__(self)
         self.ConsumerQueue = ConsumerQueue
         self.FileNames = FileNames
         #benchmark
