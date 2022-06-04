@@ -16,6 +16,6 @@ Read this Answer Carefully.
 
 https://www.youtube.com/watch?v=nxWginnBklU
 
-# Different between iter(x) and x.__iter__()
+# Different between iter(x) and x.\_\_iter__()
 
 https://stackoverflow.com/questions/31590858/what-is-the-difference-between-iterx-and-x-iter
