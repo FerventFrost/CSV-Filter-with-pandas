@@ -8,7 +8,7 @@ import time
 import pandas as pd
 
 class CSVFilter:
-    TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "TotalTime": []}
+    TimeDict = {"Producer": [], "Consumer": [], "Filter": [], "TotalRecord": [], "HealthyRecord": [], "BadRecord": [], "MemoryUsage": [], "TotalTime": []}
     TotalTime = 0
     def __init__(self, FilePath = "", BadWordPath = "", chunkSize = 100, maxNumber = 1, FilteredBy = [], Type = "", QueueMaxSize = 0, BenchmarkFileName = "Benchmark", HealthyFileName = "Healthy", UnheathlyFileName = "Unheathly"):
         self.FilePath = FilePath
@@ -21,7 +21,7 @@ class CSVFilter:
         self.Benchmark = BenchmarkFileName
         self.Healthy = HealthyFileName
         self.Unheathly = UnheathlyFileName
-
+        self.Lock = threading.Lock()
         # extract head names to use then in filter
         Columns = pd.read_csv(self.FilePath, nrows= 5).columns
 
@@ -58,9 +58,9 @@ class CSVFilter:
             Producer_Filter = queue.Queue(maxsize=self.QMaxSize)
             Filter_Counsumer = queue.Queue(maxsize=self.QMaxSize)
             #Create Objects
-            CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict, self.FileHeads)
+            CSVProducer = Producer(Producer_Filter, self.FilePath, self.chunkSize, self.maxNumber, self.TimeDict, self.FileHeads, self.Lock)
             CSVConsumer = Consumer(Filter_Counsumer, [self.Healthy, self.Unheathly], self.TimeDict)
-            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.TimeDict, self.FileHeads, self.Type)
+            CSVFilter = Filter(Producer_Filter, Filter_Counsumer, self.BadWordPath, self.TimeDict, self.FileHeads, self.Type, self.Lock)
         
             #start program time
             self.TimeDict["TotalTime"].append(time.time())

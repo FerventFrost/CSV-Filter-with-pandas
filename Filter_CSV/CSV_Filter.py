@@ -10,13 +10,14 @@ class Filter(threading.Thread):
     TrieOBJ = Trie()
     automaton = ahocorasick.Automaton()
 
-    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, TimeDict, Heads, Type):
+    def __init__(self, ProducerQueue ,ConsumerQueue, BadWord_FilePath, TimeDict, Heads, Type, Lock):
         threading.Thread.__init__(self)
         self.ProducerQueue = ProducerQueue
         self.ConsumerQueue = ConsumerQueue
         self.BadWord = BadWord_FilePath
         self.Heads = Heads
         self.Type = Type
+        self.Lock = Lock
         self.df = 0
         self.boolList = []
         #benchmark
@@ -81,8 +82,9 @@ class Filter(threading.Thread):
             self.MakeTrie()
 
         while True:
-            if not self.ProducerQueue.empty():
-                self.df = self.ProducerQueue.get()
+            #if queue is empty it will automatically be blocked till it receive item 
+            self.df = self.ProducerQueue.get()
+            with self.Lock:
 
                 if self.df is None:
                     self.ConsumerQueue.put(None)

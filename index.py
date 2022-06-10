@@ -2,13 +2,13 @@ from Filter_CSV.CSV_Main import CSVFilter
 
 
 if __name__ == "__main__":
-    maxNumber = 6
+    maxNumber = 20
     FilePath = ".\\2.csv"
     BadWordPath = ".\\badWords.csv"
-    chunkSize = 1000
+    chunkSize = 10**4*5
     FilteredBy = [0, 2, 4]
     Type = "aho"
-    QueueMaxSize = 3
+    QueueMaxSize = 5
     BenchMark_FileName = "Benchmark"
     Healthy_FileName = "Healthy"
     Bad_FileName = "Unhealthy"

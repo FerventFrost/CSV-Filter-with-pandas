@@ -1,6 +1,6 @@
 from time import time
 import pandas as pd
-
+import threading
 class Test_Iter:
     def __init__(self):
         self.li = [1,2,3,4,5]
@@ -23,8 +23,9 @@ class Test_Iter:
             sum +=i
         return sum
 
-class readcsv_Iter:
+class readcsv_Iter(threading.Thread):
     def __init__(self):
+        threading.Thread.__init__(self)
         self.Data = pd.read_csv("testFile/annual-enterprise.csv", chunksize= 50, nrows = 50 * 3)
         self.DisplayData = pd.read_csv("testFile/annual-enterprise.csv", chunksize= 50, nrows = 50 * 3)
     
@@ -52,6 +53,9 @@ class readcsv_Iter:
             i
         print(f"Display Functio time: {time() - start}")
 
+    def run(self):
+        self.display()
+
 
 
 """
@@ -71,11 +75,8 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     Data = readcsv_Iter()
     start = time()
-    Data_iter = iter(Data)
     
-    print(next(Data_iter)[0])
-    print(next(Data_iter)[0])
-    print(next(Data_iter)[0])
-    print(f"Total Time : {time() - start}")
 
-    Data.display()
+    Data.start()
+    Data.join()
+    print(f"Total Time : {time() - start}")
